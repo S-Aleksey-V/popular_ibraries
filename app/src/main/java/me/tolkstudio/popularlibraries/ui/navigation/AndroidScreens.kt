@@ -8,5 +8,5 @@ import me.tolkstudio.popularlibraries.ui.fragment.UsersFragment
 
 class AndroidScreens : IScreens {
     override fun users() = FragmentScreen { UsersFragment.newInstance() }
-    override fun user(user: GithubUser) = FragmentScreen { NicknameFragment.newInstance(user) }
+    override fun user(user: GithubUser) = FragmentScreen { NicknameFragment.newInstance() }
 }
