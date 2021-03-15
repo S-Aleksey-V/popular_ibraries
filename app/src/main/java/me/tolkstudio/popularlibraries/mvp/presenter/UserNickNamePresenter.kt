@@ -7,12 +7,12 @@ import me.tolkstudio.popularlibraries.mvp.view.UserNickNameView
 import me.tolkstudio.popularlibraries.ui.fragment.NicknameFragment
 import moxy.MvpPresenter
 
-class UserNickNamePresenter(val user: GithubUser, val router: Router) :
+class UserNickNamePresenter(val router: Router, val user: GithubUser) :
     MvpPresenter<UserNickNameView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
-        viewState.init()
+        viewState.setLogin(user.login)
     }
 
     fun backClick(): Boolean {

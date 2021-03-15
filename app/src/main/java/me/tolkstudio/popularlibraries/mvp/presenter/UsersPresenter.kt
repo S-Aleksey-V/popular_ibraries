@@ -1,6 +1,9 @@
 package me.tolkstudio.popularlibraries.mvp.presenter
 
 import com.github.terrakok.cicerone.Router
+import io.reactivex.rxjava3.core.Observable.fromIterable
+import io.reactivex.rxjava3.core.Observer
+import io.reactivex.rxjava3.disposables.Disposable
 import me.tolkstudio.popularlibraries.mvp.model.GithubUsersRepo
 import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
 import me.tolkstudio.popularlibraries.mvp.navigation.IScreens
@@ -40,9 +43,7 @@ class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val scr
     }
 
     fun loadData() {
-        val users = usersRepo.getUsers()
-        usersListPresenter.users.clear()
-        usersListPresenter.users.addAll(users)
+        execFromIterable()
         viewState.updateList()
     }
 
@@ -50,4 +51,37 @@ class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val scr
         router.exit()
         return true
     }
+
+    val stringObserver = object : Observer<GithubUser> {
+        var disposable: Disposable? = null
+
+        override fun onComplete() {
+            println("onComplete")
+        }
+
+        override fun onSubscribe(d: Disposable?) {
+            disposable = d
+            println("onSubscribe")
+        }
+
+
+        override fun onNext(s: GithubUser?) {
+            println("onNext: $s")
+            usersListPresenter.users.add( s!!)
+
+        }
+
+        override fun onError(e: Throwable?) {
+            println("onError: ${e?.message}")
+        }
+
+
+    }
+
+    fun execFromIterable() {
+        usersRepo.fromIterable()
+            ?.subscribe(stringObserver)
+    }
 }
+
+

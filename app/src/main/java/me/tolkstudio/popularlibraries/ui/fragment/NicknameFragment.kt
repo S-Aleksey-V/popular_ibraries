@@ -12,17 +12,24 @@ import me.tolkstudio.popularlibraries.ui.BackClickListener
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
-class NicknameFragment(user: GithubUser) : MvpAppCompatFragment(), UserNickNameView, BackClickListener {
+class NicknameFragment() : MvpAppCompatFragment(), UserNickNameView, BackClickListener {
 
     companion object {
-        fun newInstance() = NicknameFragment() // может вот так но я не знаю
+
+        private const val USER_ARG = "user"
+
+        fun newInstance(user: GithubUser) = NicknameFragment().apply {
+            arguments = Bundle().apply {
+                putParcelable(USER_ARG, user)
+            }
+        }
     }
 
     private val presenter by moxyPresenter {
-        UserNickNamePresenter(user,App.instance.router)
+        val user = arguments?.getParcelable<GithubUser>(USER_ARG) as GithubUser
+        UserNickNamePresenter(App.instance.router, user)
 
     }
-
 
     private var vb: NickNameBinding? = null
 
@@ -41,8 +48,9 @@ class NicknameFragment(user: GithubUser) : MvpAppCompatFragment(), UserNickNameV
 
     override fun backPressed() = presenter.backClick()
 
-    override fun init() {
-        vb?.nickName?.text = presenter.user.login
+
+    override fun setLogin(text: String) {
+        vb?.nickName?.text = text
     }
 
 
