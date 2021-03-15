@@ -15,7 +15,7 @@ class GithubUsersRepo : Screen {
         GithubUser("Login5")
     )
 
-    fun getUsers() : Observable<GithubUser> {
-        return Observable.fromIterable(users)
+    fun getUsers() : Observable<List<GithubUser>> {
+        return Observable.just(users)
     }
 }
