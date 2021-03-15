@@ -7,15 +7,15 @@ import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
 
 class GithubUsersRepo : Screen {
 
-    fun fromIterable() : Observable<GithubUser> {
+    private val users = listOf(
+        GithubUser("Login1"),
+        GithubUser("Login2"),
+        GithubUser("Login3"),
+        GithubUser("Login4"),
+        GithubUser("Login5")
+    )
 
-         val users = listOf(
-            GithubUser("Login1"),
-            GithubUser("Login2"),
-            GithubUser("Login3"),
-            GithubUser("Login4"),
-            GithubUser("Login5")
-        )
+    fun getUsers() : Observable<GithubUser> {
         return Observable.fromIterable(users)
     }
 }

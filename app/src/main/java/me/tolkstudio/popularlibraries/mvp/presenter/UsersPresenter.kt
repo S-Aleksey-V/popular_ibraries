@@ -43,7 +43,9 @@ class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val scr
     }
 
     fun loadData() {
-        execFromIterable()
+        usersRepo.getUsers().subscribe {listuser ->
+            usersListPresenter.users.addAll(listOf(listuser))
+        }
         viewState.updateList()
     }
 
@@ -52,36 +54,6 @@ class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val scr
         return true
     }
 
-    val stringObserver = object : Observer<GithubUser> {
-        var disposable: Disposable? = null
-
-        override fun onComplete() {
-            println("onComplete")
-        }
-
-        override fun onSubscribe(d: Disposable?) {
-            disposable = d
-            println("onSubscribe")
-        }
-
-
-        override fun onNext(s: GithubUser?) {
-            println("onNext: $s")
-            usersListPresenter.users.add( s!!)
-
-        }
-
-        override fun onError(e: Throwable?) {
-            println("onError: ${e?.message}")
-        }
-
-
-    }
-
-    fun execFromIterable() {
-        usersRepo.fromIterable()
-            ?.subscribe(stringObserver)
-    }
 }
 
 
