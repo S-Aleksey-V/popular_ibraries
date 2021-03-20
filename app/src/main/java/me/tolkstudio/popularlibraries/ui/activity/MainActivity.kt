@@ -1,38 +1,49 @@
 package me.tolkstudio.popularlibraries.ui.activity
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
+import com.github.terrakok.cicerone.androidx.AppNavigator
+import me.tolkstudio.popularlibraries.R
 import me.tolkstudio.popularlibraries.databinding.ActivityMainBinding
-import me.tolkstudio.popularlibraries.mvp.presenter.Presenter
+import me.tolkstudio.popularlibraries.mvp.presenter.MainPresenter
 import me.tolkstudio.popularlibraries.mvp.view.MainView
+import me.tolkstudio.popularlibraries.ui.App
+import me.tolkstudio.popularlibraries.ui.BackClickListener
+import me.tolkstudio.popularlibraries.ui.navigation.AndroidScreens
+import moxy.MvpAppCompatActivity
+import moxy.ktx.moxyPresenter
 
-class MainActivity : AppCompatActivity(), MainView {
+class MainActivity : MvpAppCompatActivity(), MainView {
+
+    val navigator = AppNavigator(this, R.id.container)
 
     private var vb: ActivityMainBinding? = null
-
-    val presenter = Presenter(this)
+    private val presenter by moxyPresenter {
+        MainPresenter(App.instance.router, AndroidScreens())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         vb = ActivityMainBinding.inflate(layoutInflater)
         setContentView(vb?.root)
-
-        vb?.btnCounter1?.setOnClickListener { presenter.counterOneClick() }
-        vb?.btnCounter2?.setOnClickListener { presenter.counterTwoClick() }
-        vb?.btnCounter3?.setOnClickListener { presenter.counterThreeClick() }
-
     }
 
-    override fun setButtonOneText(text: String) {
-        vb?.btnCounter1?.text = text
+    override fun onResumeFragments() {
+        super.onResumeFragments()
+        App.instance.navigatorHolder.setNavigator(navigator)
     }
 
-    override fun setButtonTwoText(text: String) {
-        vb?.btnCounter2?.text = text
+    override fun onPause() {
+        super.onPause()
+        App.instance.navigatorHolder.removeNavigator()
     }
 
-    override fun setButtonThreeText(text: String) {
-        vb?.btnCounter3?.text = text
+    override fun onBackPressed() {
+        supportFragmentManager.fragments.forEach {
+            if (it is BackClickListener && it.backPressed()) {
+                return
+            }
+        }
+        presenter.bacClicked()
     }
+
 }
