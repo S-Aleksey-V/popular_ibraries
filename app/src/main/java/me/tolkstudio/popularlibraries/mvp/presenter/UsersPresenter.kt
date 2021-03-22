@@ -1,34 +1,41 @@
 package me.tolkstudio.popularlibraries.mvp.presenter
 
 import com.github.terrakok.cicerone.Router
-import io.reactivex.rxjava3.core.Observable.fromIterable
-import io.reactivex.rxjava3.core.Observer
-import io.reactivex.rxjava3.disposables.Disposable
-import me.tolkstudio.popularlibraries.mvp.model.GithubUsersRepo
+import io.reactivex.rxjava3.core.Scheduler
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
+import me.tolkstudio.popularlibraries.mvp.model.repo.IGithubUsersRepo
 import me.tolkstudio.popularlibraries.mvp.navigation.IScreens
 import me.tolkstudio.popularlibraries.mvp.presenter.list.IUsersListPresenter
 import me.tolkstudio.popularlibraries.mvp.view.UsersView
 import me.tolkstudio.popularlibraries.mvp.view.list.IUserItemView
 import moxy.MvpPresenter
 
-class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val screens: IScreens) :
+
+class UsersPresenter(
+    val uiScheduler: Scheduler,
+    val usersRepo: IGithubUsersRepo,
+    val router: Router,
+    val screen: IScreens
+) :
     MvpPresenter<UsersView>() {
 
     class UsersListPresenter : IUsersListPresenter {
+
         val users = mutableListOf<GithubUser>()
         override var itemClickListener: ((IUserItemView) -> Unit)? = null
 
         override fun bindView(view: IUserItemView) {
             val user = users[view.pos]
-            view.setLogin(user.login)
+            user.login.let { view.setLogin(it) }
+            view.loadAvatar(user.avatarUrl)
         }
 
         override fun getCount() = users.size
-
     }
 
     val usersListPresenter = UsersListPresenter()
+    val compositeDisposable = CompositeDisposable()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -37,16 +44,20 @@ class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val scr
 
         usersListPresenter.itemClickListener = { view ->
             val user = usersListPresenter.users[view.pos]
-            router.navigateTo(screens.user(user))
+            router.navigateTo(screen.user(user))
         }
-
     }
 
     fun loadData() {
-        usersRepo.getUsers().subscribe {listuser ->
-            usersListPresenter.users.addAll(listuser)
-        }
-        viewState.updateList()
+        val disposable = usersRepo.getRepo()
+            .observeOn(uiScheduler)
+            .subscribe({ usersList ->
+                usersListPresenter.users.addAll(usersList)
+                viewState.updateList()
+            }, { error ->
+                error.printStackTrace()
+            })
+        compositeDisposable.add(disposable)
     }
 
     fun backClick(): Boolean {
@@ -54,6 +65,10 @@ class UsersPresenter(val usersRepo: GithubUsersRepo, val router: Router, val scr
         return true
     }
 
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
 }
 
 

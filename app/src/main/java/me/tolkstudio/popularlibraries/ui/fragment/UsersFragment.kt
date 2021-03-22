@@ -4,15 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.terrakok.cicerone.Screen
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import me.tolkstudio.popularlibraries.databinding.FragmentUsersBinding
-import me.tolkstudio.popularlibraries.mvp.model.GithubUsersRepo
-import me.tolkstudio.popularlibraries.mvp.navigation.IScreens
+import me.tolkstudio.popularlibraries.mvp.model.api.ApiHolder
+import me.tolkstudio.popularlibraries.mvp.model.repo.RetrofitGitHubUsersRepo
 import me.tolkstudio.popularlibraries.mvp.presenter.UsersPresenter
 import me.tolkstudio.popularlibraries.mvp.view.UsersView
 import me.tolkstudio.popularlibraries.ui.App
 import me.tolkstudio.popularlibraries.ui.BackClickListener
 import me.tolkstudio.popularlibraries.ui.adapter.UsersRVAdapter
+import me.tolkstudio.popularlibraries.ui.image.GlideImageLoader
 import me.tolkstudio.popularlibraries.ui.navigation.AndroidScreens
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
@@ -24,7 +25,11 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackClickListener {
     }
 
     private val presenter by moxyPresenter {
-        UsersPresenter(GithubUsersRepo(), App.instance.router, AndroidScreens())
+        UsersPresenter(
+            AndroidSchedulers.mainThread(),
+            RetrofitGitHubUsersRepo(ApiHolder.api),
+            App.instance.router, AndroidScreens()
+        )
     }
 
     private var vb: FragmentUsersBinding? = null
@@ -46,7 +51,7 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackClickListener {
 
     override fun init() {
         vb?.rvUsers?.layoutManager = LinearLayoutManager(requireContext())
-        adapter = UsersRVAdapter(presenter.usersListPresenter)
+        adapter = UsersRVAdapter(presenter.usersListPresenter, GlideImageLoader())
         vb?.rvUsers?.adapter = adapter
     }
 
