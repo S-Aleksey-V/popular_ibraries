@@ -8,7 +8,7 @@ import me.tolkstudio.popularlibraries.mvp.model.repo.IGithubUsersRepo
 import me.tolkstudio.popularlibraries.mvp.navigation.IScreens
 import me.tolkstudio.popularlibraries.mvp.presenter.list.IUsersListPresenter
 import me.tolkstudio.popularlibraries.mvp.view.UsersView
-import me.tolkstudio.popularlibraries.mvp.view.list.IUserItemView
+import me.tolkstudio.popularlibraries.mvp.view.list.UserItemView
 import moxy.MvpPresenter
 
 
@@ -23,15 +23,15 @@ class UsersPresenter(
     class UsersListPresenter : IUsersListPresenter {
 
         val users = mutableListOf<GithubUser>()
-        override var itemClickListener: ((IUserItemView) -> Unit)? = null
-
-        override fun bindView(view: IUserItemView) {
-            val user = users[view.pos]
-            user.login.let { view.setLogin(it) }
-            view.loadAvatar(user.avatarUrl)
-        }
+        override var itemClickListener: ((UserItemView) -> Unit)? = null
 
         override fun getCount() = users.size
+
+        override fun bindView(view: UserItemView) {
+            val user = users[view.pos]
+            user.login.let { view.setLogin(it) }
+            user.avatarUrl?.let { view.loadAvatar(it) }
+        }
     }
 
     val usersListPresenter = UsersListPresenter()
@@ -49,15 +49,15 @@ class UsersPresenter(
     }
 
     fun loadData() {
-        val disposable = usersRepo.getRepo()
+        usersRepo.getUsers()
             .observeOn(uiScheduler)
-            .subscribe({ usersList ->
-                usersListPresenter.users.addAll(usersList)
+            .subscribe({ repos ->
+                usersListPresenter.users.clear()
+                usersListPresenter.users.addAll(repos)
                 viewState.updateList()
-            }, { error ->
-                error.printStackTrace()
+            }, {
+                println("Error: ${it.message}")
             })
-        compositeDisposable.add(disposable)
     }
 
     fun backClick(): Boolean {

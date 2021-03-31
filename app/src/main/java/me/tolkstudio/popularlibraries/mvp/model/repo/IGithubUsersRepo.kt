@@ -5,5 +5,5 @@ import me.tolkstudio.popularlibraries.mvp.model.entity.GitHubRepo
 import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
 
 interface IGithubUsersRepo {
-    fun getRepo(): Single<List<GithubUser>>
+    fun getUsers(): Single<List<GithubUser>>
 }

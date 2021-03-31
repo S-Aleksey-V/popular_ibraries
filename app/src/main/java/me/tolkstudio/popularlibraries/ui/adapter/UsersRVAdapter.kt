@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import me.tolkstudio.popularlibraries.databinding.ItemUserBinding
 import me.tolkstudio.popularlibraries.mvp.model.image.IImageLoader
 import me.tolkstudio.popularlibraries.mvp.presenter.list.IUsersListPresenter
-import me.tolkstudio.popularlibraries.mvp.view.list.IUserItemView
+import me.tolkstudio.popularlibraries.mvp.view.list.UserItemView
 
 class UsersRVAdapter(val presenter: IUsersListPresenter, val imageLoader: IImageLoader<ImageView>) :
     RecyclerView.Adapter<UsersRVAdapter.ViewHolder>() {
@@ -29,7 +29,7 @@ class UsersRVAdapter(val presenter: IUsersListPresenter, val imageLoader: IImage
         presenter.bindView(holder.apply { pos = position })
 
     inner class ViewHolder(val vb: ItemUserBinding) : RecyclerView.ViewHolder(vb.root),
-        IUserItemView {
+        UserItemView {
 
         override var pos = -1
 

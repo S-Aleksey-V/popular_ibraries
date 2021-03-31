@@ -5,6 +5,6 @@ import io.reactivex.rxjava3.core.Single
 import me.tolkstudio.popularlibraries.mvp.model.entity.GitHubRepo
 import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
 
-interface IRepoInfo {
-    fun getRepoInfo(githubRepos: GitHubRepo): @NonNull Single<List<GithubUser>>?
+interface IGitHubRepositoriesRepo {
+    fun getRepositories(user: GithubUser): Single<List<GitHubRepo>>
 }

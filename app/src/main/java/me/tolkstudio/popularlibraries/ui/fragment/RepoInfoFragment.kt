@@ -9,8 +9,7 @@ import me.tolkstudio.popularlibraries.databinding.FragmentRepoInfoBinding
 import me.tolkstudio.popularlibraries.mvp.model.api.ApiHolder
 import me.tolkstudio.popularlibraries.mvp.model.entity.GitHubRepo
 import me.tolkstudio.popularlibraries.mvp.model.image.IImageLoader
-import me.tolkstudio.popularlibraries.mvp.model.repo.RetrofitRepoInfo
-import me.tolkstudio.popularlibraries.mvp.presenter.RepoInfoPresenter
+import me.tolkstudio.popularlibraries.mvp.presenter.RepositoryPresenter
 import me.tolkstudio.popularlibraries.mvp.view.RepoInfoView
 import me.tolkstudio.popularlibraries.ui.App
 import me.tolkstudio.popularlibraries.ui.BackClickListener
@@ -20,28 +19,23 @@ import me.tolkstudio.popularlibraries.ui.navigation.AndroidScreens
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
-class RepoInfoFragment(val imageLoader: IImageLoader<ImageView>) : MvpAppCompatFragment(),
+class RepoInfoFragment() : MvpAppCompatFragment(),
     RepoInfoView, BackClickListener {
 
     companion object {
-        private const val USER_ARG = "repos"
-        fun newInstance(user: GitHubRepo) = RepoInfoFragment(GlideImageLoader()).apply {
+        private const val REPOSITORY_ARG = "repository"
+        fun newInstance(repository: GitHubRepo) = RepoInfoFragment().apply {
             arguments = Bundle().apply {
-                putParcelable(USER_ARG, user)
+                putParcelable(REPOSITORY_ARG, repository)
             }
         }
     }
 
     private var vb: FragmentRepoInfoBinding? = null
-    private var adapter: UserReposAdapter? = null
 
     private val presenter by moxyPresenter {
-        val repo = arguments?.getParcelable<GitHubRepo>(USER_ARG) as GitHubRepo
-        RepoInfoPresenter(
-            AndroidSchedulers.mainThread(),
-            RetrofitRepoInfo(ApiHolder.api),
-            App.instance.router, repo, AndroidScreens()
-        )
+        val repo = arguments?.getParcelable<GitHubRepo>(REPOSITORY_ARG) as GitHubRepo
+        RepositoryPresenter(App.instance.router, repo)
     }
 
     override fun onCreateView(
@@ -60,27 +54,41 @@ class RepoInfoFragment(val imageLoader: IImageLoader<ImageView>) : MvpAppCompatF
 
     override fun backPressed(): Boolean = presenter.backClick()
 
+    override fun init() {}
 
-    override fun updateReposList() {
-        adapter?.notifyDataSetChanged()
-    }
-
-    override fun setLogin(text: String) {
-        vb?.repoName?.text = text
-    }
-
-
-    override fun setWatchers(text: String) {
+    override fun setId(text: String) {
         vb?.userFullName?.text = text
     }
 
-    override fun setForks(text: String) {
+    override fun setTitle(text: String) {
+        vb?.repoName?.text = text
+    }
+
+    override fun setForksCount(text: String) {
         vb?.forksCount?.text = text
     }
 
-    override fun setDefaultBranch(text: String) {
-        vb?.defaultBranch?.text = text
-    }
+
+//    override fun updateReposList() {
+//        adapter?.notifyDataSetChanged()
+//    }
+//
+//    override fun setLogin(text: String) {
+//        vb?.repoName?.text = text
+//    }
+//
+//
+//    override fun setWatchers(text: String) {
+//        vb?.userFullName?.text = text
+//    }
+//
+//    override fun setForks(text: String) {
+//        vb?.forksCount?.text = text
+//    }
+//
+//    override fun setDefaultBranch(text: String) {
+//        vb?.defaultBranch?.text = text
+//    }
 
 
 }
