@@ -6,62 +6,60 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import me.tolkstudio.popularlibraries.mvp.model.entity.GitHubRepo
 
 import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
-import me.tolkstudio.popularlibraries.mvp.model.repo.IGitHubUserRepos
+import me.tolkstudio.popularlibraries.mvp.model.repo.IGitHubRepositoriesRepo
 import me.tolkstudio.popularlibraries.mvp.navigation.IScreens
 import me.tolkstudio.popularlibraries.mvp.presenter.list.IUserRepoListPresenter
-import me.tolkstudio.popularlibraries.mvp.view.USersInfoView
-import me.tolkstudio.popularlibraries.mvp.view.list.IUserReposItemView
+import me.tolkstudio.popularlibraries.mvp.view.UsersView
+import me.tolkstudio.popularlibraries.mvp.view.list.RepositoryItemView
 import moxy.MvpPresenter
 
 class UserInfoPresenter(
     val uiScheduler: Scheduler,
+    val repositoriesRepo: IGitHubRepositoriesRepo,
     val router: Router,
     val user: GithubUser,
-    val repos: IGitHubUserRepos,
-    val screen: IScreens
+    val screens: IScreens
 ) :
-    MvpPresenter<USersInfoView>() {
+    MvpPresenter<UsersView>() {
 
     class UserReposListPresenter : IUserRepoListPresenter {
 
         val repos = mutableListOf<GitHubRepo>()
-        override var itemClickListener: ((IUserReposItemView) -> Unit)? = null
-
-        override fun bindView(view: IUserReposItemView) {
-            val repos = repos[view.pos]
-            repos.name.let { view.setNameRepos(it) }
-        }
+        override var itemClickListener: ((RepositoryItemView) -> Unit)? = null
 
         override fun getCount() = repos.size
+
+        override fun bindView(view: RepositoryItemView) {
+            val repos = repos[view.pos]
+            repos.name.let { view.setName(it) }
+        }
     }
 
     val userReposListPresenter = UserReposListPresenter()
-    val compositeDisposable = CompositeDisposable()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
         viewState.init()
-        viewState.setLogin(user.login)
-        viewState.setImage(user.avatarUrl)
         loadRepos()
 
+
         userReposListPresenter.itemClickListener = { view ->
-            val user = userReposListPresenter.repos[view.pos]
-            router.navigateTo(screen.fork(user))
+            val repository = userReposListPresenter.repos[view.pos]
+            router.navigateTo(screens.repository(repository))
         }
 
     }
 
-    private fun loadRepos() {
-        val disposable = repos.getRepos(user)
+    fun loadRepos() {
+        repositoriesRepo.getRepositories(user)
             .observeOn(uiScheduler)
-            .subscribe({ reposList ->
-                userReposListPresenter.repos.addAll(reposList)
-                viewState.updateReposList()
-            }, { error ->
-                error.printStackTrace()
+            .subscribe({ repositories ->
+                userReposListPresenter.repos.clear()
+                userReposListPresenter.repos.addAll(repositories)
+                viewState.updateList()
+            }, {
+                println("Error: ${it.message}")
             })
-        compositeDisposable.add(disposable)
     }
 
     fun backClick(): Boolean {
