@@ -2,10 +2,8 @@ package me.tolkstudio.popularlibraries.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
 import me.tolkstudio.popularlibraries.databinding.ItemUserRepoBinding
-import me.tolkstudio.popularlibraries.mvp.model.image.IImageLoader
 import me.tolkstudio.popularlibraries.mvp.presenter.list.IUserRepoListPresenter
 import me.tolkstudio.popularlibraries.mvp.view.list.RepositoryItemView
 

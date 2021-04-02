@@ -14,7 +14,7 @@ import java.lang.IllegalStateException
 @androidx.room.Database(
     entities = [
         RoomGithubUser::class,
-        RoomGithubRepository::class ,
+        RoomGithubRepository::class,
         RoomCachedImage::class
     ],
     version = 1
@@ -25,7 +25,7 @@ abstract class Database : RoomDatabase() {
     abstract val imageDao: ImageDao
 
     companion object {
-        private const val DB_NAME = "database.db"
+        const val DB_NAME = "database.db"
         private var instance: Database? = null
         fun getInstance() = instance ?: throw IllegalStateException("Database has not been created")
 

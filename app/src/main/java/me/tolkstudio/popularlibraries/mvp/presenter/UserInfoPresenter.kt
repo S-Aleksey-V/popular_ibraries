@@ -12,15 +12,24 @@ import me.tolkstudio.popularlibraries.mvp.presenter.list.IUserRepoListPresenter
 import me.tolkstudio.popularlibraries.mvp.view.UsersView
 import me.tolkstudio.popularlibraries.mvp.view.list.RepositoryItemView
 import moxy.MvpPresenter
+import javax.inject.Inject
+import javax.inject.Named
 
 class UserInfoPresenter(
-    val uiScheduler: Scheduler,
-    val repositoriesRepo: IGitHubRepositoriesRepo,
-    val router: Router,
-    val user: GithubUser,
-    val screens: IScreens
+    val user: GithubUser
+
 ) :
     MvpPresenter<UsersView>() {
+
+    @field:Named("ui")
+    @Inject
+    lateinit var uiScheduler: Scheduler
+    @Inject
+    lateinit var repositoriesRepo: IGitHubRepositoriesRepo
+    @Inject
+    lateinit var router: Router
+    @Inject
+    lateinit var screens: IScreens
 
     class UserReposListPresenter : IUserRepoListPresenter {
 

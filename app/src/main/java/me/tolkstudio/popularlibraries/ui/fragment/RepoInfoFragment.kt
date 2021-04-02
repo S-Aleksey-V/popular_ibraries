@@ -3,19 +3,11 @@ package me.tolkstudio.popularlibraries.ui.fragment
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import me.tolkstudio.popularlibraries.databinding.FragmentRepoInfoBinding
-import me.tolkstudio.popularlibraries.mvp.model.api.ApiHolder
 import me.tolkstudio.popularlibraries.mvp.model.entity.GitHubRepo
-import me.tolkstudio.popularlibraries.mvp.model.image.IImageLoader
 import me.tolkstudio.popularlibraries.mvp.presenter.RepositoryPresenter
 import me.tolkstudio.popularlibraries.mvp.view.RepoInfoView
-import me.tolkstudio.popularlibraries.ui.App
 import me.tolkstudio.popularlibraries.ui.BackClickListener
-import me.tolkstudio.popularlibraries.ui.adapter.UserReposAdapter
-import me.tolkstudio.popularlibraries.ui.image.GlideImageLoader
-import me.tolkstudio.popularlibraries.ui.navigation.AndroidScreens
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
@@ -35,7 +27,7 @@ class RepoInfoFragment() : MvpAppCompatFragment(),
 
     private val presenter by moxyPresenter {
         val repo = arguments?.getParcelable<GitHubRepo>(REPOSITORY_ARG) as GitHubRepo
-        RepositoryPresenter(App.instance.router, repo)
+        RepositoryPresenter(repo)
     }
 
     override fun onCreateView(
@@ -52,7 +44,7 @@ class RepoInfoFragment() : MvpAppCompatFragment(),
         vb = null
     }
 
-    override fun backPressed(): Boolean = presenter.backClick()
+
 
     override fun init() {}
 
@@ -68,27 +60,6 @@ class RepoInfoFragment() : MvpAppCompatFragment(),
         vb?.forksCount?.text = text
     }
 
-
-//    override fun updateReposList() {
-//        adapter?.notifyDataSetChanged()
-//    }
-//
-//    override fun setLogin(text: String) {
-//        vb?.repoName?.text = text
-//    }
-//
-//
-//    override fun setWatchers(text: String) {
-//        vb?.userFullName?.text = text
-//    }
-//
-//    override fun setForks(text: String) {
-//        vb?.forksCount?.text = text
-//    }
-//
-//    override fun setDefaultBranch(text: String) {
-//        vb?.defaultBranch?.text = text
-//    }
-
+    override fun backPressed() = presenter.backPressed()
 
 }

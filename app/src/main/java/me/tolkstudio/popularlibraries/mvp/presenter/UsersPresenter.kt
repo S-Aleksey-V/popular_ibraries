@@ -2,7 +2,6 @@ package me.tolkstudio.popularlibraries.mvp.presenter
 
 import com.github.terrakok.cicerone.Router
 import io.reactivex.rxjava3.core.Scheduler
-import io.reactivex.rxjava3.disposables.CompositeDisposable
 import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
 import me.tolkstudio.popularlibraries.mvp.model.repo.IGithubUsersRepo
 import me.tolkstudio.popularlibraries.mvp.navigation.IScreens
@@ -10,15 +9,22 @@ import me.tolkstudio.popularlibraries.mvp.presenter.list.IUsersListPresenter
 import me.tolkstudio.popularlibraries.mvp.view.UsersView
 import me.tolkstudio.popularlibraries.mvp.view.list.UserItemView
 import moxy.MvpPresenter
+import javax.inject.Inject
 
 
 class UsersPresenter(
-    val uiScheduler: Scheduler,
-    val usersRepo: IGithubUsersRepo,
-    val router: Router,
-    val screen: IScreens
+    val uiScheduler: Scheduler
 ) :
     MvpPresenter<UsersView>() {
+
+    @Inject
+    lateinit var usersRepo: IGithubUsersRepo
+
+    @Inject
+    lateinit var screen: IScreens
+
+    @Inject
+    lateinit var router: Router
 
     class UsersListPresenter : IUsersListPresenter {
 
@@ -35,7 +41,6 @@ class UsersPresenter(
     }
 
     val usersListPresenter = UsersListPresenter()
-    val compositeDisposable = CompositeDisposable()
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -65,10 +70,6 @@ class UsersPresenter(
         return true
     }
 
-    override fun onDestroy() {
-        compositeDisposable.dispose()
-        super.onDestroy()
-    }
 }
 
 

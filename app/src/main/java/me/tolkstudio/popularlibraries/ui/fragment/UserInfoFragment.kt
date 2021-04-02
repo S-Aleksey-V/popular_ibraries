@@ -43,17 +43,9 @@ class UserInfoFragment() : MvpAppCompatFragment(),
 
     val presenter by moxyPresenter {
         val user = arguments?.getParcelable<GithubUser>(USER_ARG) as GithubUser
-        UserInfoPresenter(
-            AndroidSchedulers.mainThread(),
-            RetrofitGithubRepositoriesRepo(
-                ApiHolder.api,
-                AndroidNetworkStatus(App.instance),
-                RoomGithubRepositoriesCache(Database.getInstance())
-            ),
-            App.instance.router,
-            user,
-            AndroidScreens()
-        )
+        UserInfoPresenter(user).apply {
+            App.instance.appComponent.inject(this)
+        }
     }
 
     override fun onCreateView(
