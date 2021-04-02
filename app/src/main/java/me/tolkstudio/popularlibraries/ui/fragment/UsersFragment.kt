@@ -6,15 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import me.tolkstudio.popularlibraries.databinding.FragmentUsersBinding
-import me.tolkstudio.popularlibraries.mvp.model.api.ApiHolder
-import me.tolkstudio.popularlibraries.mvp.model.repo.RetrofitGitHubUsersRepo
+import me.tolkstudio.popularlibraries.mvp.model.cache.room.RoomImageCache
+import me.tolkstudio.popularlibraries.mvp.model.entity.room.db.Database
 import me.tolkstudio.popularlibraries.mvp.presenter.UsersPresenter
 import me.tolkstudio.popularlibraries.mvp.view.UsersView
 import me.tolkstudio.popularlibraries.ui.App
 import me.tolkstudio.popularlibraries.ui.BackClickListener
 import me.tolkstudio.popularlibraries.ui.adapter.UsersRVAdapter
 import me.tolkstudio.popularlibraries.ui.image.GlideImageLoader
-import me.tolkstudio.popularlibraries.ui.navigation.AndroidScreens
+import me.tolkstudio.popularlibraries.ui.network.AndroidNetworkStatus
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 
@@ -24,12 +24,12 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackClickListener {
         fun newInstance() = UsersFragment()
     }
 
-    private val presenter by moxyPresenter {
+    val presenter: UsersPresenter by moxyPresenter {
         UsersPresenter(
-            AndroidSchedulers.mainThread(),
-            RetrofitGitHubUsersRepo(ApiHolder.api),
-            App.instance.router, AndroidScreens()
-        )
+            AndroidSchedulers.mainThread()
+        ).apply {
+            App.instance.appComponent.inject(this)
+        }
     }
 
     private var vb: FragmentUsersBinding? = null
@@ -51,7 +51,11 @@ class UsersFragment : MvpAppCompatFragment(), UsersView, BackClickListener {
 
     override fun init() {
         vb?.rvUsers?.layoutManager = LinearLayoutManager(requireContext())
-        adapter = UsersRVAdapter(presenter.usersListPresenter, GlideImageLoader())
+        adapter = UsersRVAdapter(
+            presenter.usersListPresenter).apply {
+        App.instance.appComponent.inject(this)
+        }
+
         vb?.rvUsers?.adapter = adapter
     }
 

@@ -7,5 +7,5 @@ import me.tolkstudio.popularlibraries.mvp.model.entity.GithubUser
 interface IScreens {
     fun users(): Screen
     fun user(githubUser: GithubUser): Screen
-    fun fork(githubUser: GitHubRepo): Screen
+    fun repository(gitHubRepo: GitHubRepo): Screen
 }

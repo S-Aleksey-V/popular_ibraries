@@ -1,5 +1,5 @@
 package me.tolkstudio.popularlibraries.mvp.presenter.list
 
-import me.tolkstudio.popularlibraries.mvp.view.list.IUserItemView
+import me.tolkstudio.popularlibraries.mvp.view.list.UserItemView
 
-interface IUsersListPresenter : ILIstPresenter<IUserItemView>
+interface IUsersListPresenter : ILIstPresenter<UserItemView>

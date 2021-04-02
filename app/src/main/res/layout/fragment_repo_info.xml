@@ -7,7 +7,6 @@
     android:orientation="vertical">
 
 
-
     <TextView
         android:id="@+id/repo_name"
         android:layout_width="wrap_content"
@@ -78,8 +77,8 @@
         android:id="@+id/text_branch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
         android:layout_marginStart="30dp"
+        android:layout_marginTop="26dp"
         android:text="@string/DefaultBranch"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
